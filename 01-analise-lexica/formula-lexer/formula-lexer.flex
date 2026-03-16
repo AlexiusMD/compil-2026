@@ -1,0 +1,88 @@
+import java.io.InputStreamReader;
+%%
+
+
+%public
+%class FormulaLexer
+%integer
+%unicode
+%line
+
+
+%{
+
+public static int AVALNAME  = 257;
+public static int NUM 	    = 258;
+
+/**
+   * Runs the scanner on input files.
+   *
+   * This is a standalone scanner, it will print any unmatched
+   * text to System.out unchanged.
+   *
+   * @param argv   the command line, contains the filenames to run
+   *               the scanner on.
+   */
+  public static void main(String argv[]) {
+    FormulaLexer scanner;
+    if (argv.length == 0) {
+      try {        
+          // scanner = new FormulaLexer( System.in );
+          scanner = new FormulaLexer( new InputStreamReader(System.in) );
+          while ( !scanner.zzAtEOF ) 
+	        System.out.println("line: " + (scanner.yyline + 1) + " - token: "+scanner.yylex()+"\t<"+scanner.yytext()+">");
+        }
+        catch (Exception e) {
+          System.out.println("Unexpected exception:");
+          e.printStackTrace();
+        }
+        
+    }
+    else {
+      for (int i = 0; i < argv.length; i++) {
+        scanner = null;
+        try {
+          scanner = new FormulaLexer( new java.io.FileReader(argv[i]) );
+          while ( !scanner.zzAtEOF ) 	
+                System.out.println("line: " + (scanner.yyline + 1) + " - token: "+scanner.yylex()+"\t<"+scanner.yytext()+">");
+        }
+        catch (java.io.FileNotFoundException e) {
+          System.out.println("File not found : \""+argv[i]+"\"");
+        }
+        catch (java.io.IOException e) {
+          System.out.println("IO error scanning file \""+argv[i]+"\"");
+          System.out.println(e);
+        }
+        catch (Exception e) {
+          System.out.println("Unexpected exception:");
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+
+
+%}
+
+DIGIT=		[0-9]
+LETTER=   [a-zA-Z]
+WHITESPACE=	[ \t]
+LineTerminator = \r|\n|\r\n    
+QUOTE = \"
+DecimalSeparator = \.
+
+%%
+
+{LETTER}({DIGIT}|{LETTER})?            {return AVALNAME;}
+{DIGIT}+({DecimalSeparator}{DIGIT}+)?  {return NUM;}
+
+"," |
+"+" |
+"-" |
+"/" |
+"*" |
+"(" |
+")"                         {return yytext().charAt(0);}
+{WHITESPACE}+               { }
+{LineTerminator}		{}
+.          {System.out.println(yyline+1 + ": caracter invalido: "+yytext());}
