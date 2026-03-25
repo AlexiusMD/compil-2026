@@ -154,11 +154,8 @@ public class AsdrSample {
    }
 
 
-  private void verifica(int expected) {
-      if (laToken == expected)
-         laToken = this.yylex();
-      else {
-         String expStr, laStr;       
+   private void msgErro(int expected) {
+       String expStr, laStr;       
 
 		expStr = ((expected < BASE_TOKEN_NUM )
                 ? ""+(char)expected
@@ -170,6 +167,14 @@ public class AsdrSample {
 
           yyerror( "esperado token: " + expStr +
                    " na entrada: " + laStr);
+
+   }
+  private void verifica(int expected) {
+      if (laToken == expected)
+         laToken = this.yylex();
+      else {
+         msgErro(expected);
+  
      }
    }
 
