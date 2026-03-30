@@ -39,8 +39,10 @@ public class AsdrJson {
    
    ARRAY: "[" ELEMENTS "]"
    
-   ELEMENTS: ELEMENTS "," VALUE
-      | VALUE
+   ELEMENTS: VALUE RESTO_ELEMENTS  // recursivo à direita
+
+   RESTO_ELEMENTS : "," ELEMENTS
+                  |  //vazio
    
    VALUE: STRING
       | NUMBER
@@ -49,27 +51,71 @@ public class AsdrJson {
 ***/  
 
    private void Json() {
-      // TODO
+      switch (laToken) {
+         case '[':
+            ARRAY();
+            break;
+         case '{':
+            OBJECT();
+            break;
+         default:
+            yyerror("Expected [ or {");
+            break;
+      }
    }
 
    private void OBJECT() {
-      // TODO
+      verifica('{');
+      MEMBERS();
+      verifica('}');
    }
 
    private void ARRAY() {
-      // TODO
+      verifica('[');
+      ELEMENTS();
+      verifica(']');
    }
 
    private void MEMBERS() {
-      // TODO
+      verifica(STRING);
+      verifica(':');
+      VALUE();
+      if (laToken == ',') {
+         verifica(',');
+         MEMBERS();
+      }
    }
 
    private void ELEMENTS() {
-      // TODO
+      VALUE();
+      RESTO_ELEMENTS();
+   }
+
+   private void RESTO_ELEMENTS() {
+      if (laToken == ',') {
+         verifica(',');
+         ELEMENTS();
+      }
    }
 
    private void VALUE() {
-      // TODO
+      switch (laToken) {
+         case STRING:
+            verifica(STRING);
+            break;
+         case NUM:
+            verifica(NUM);
+            break;
+         case '{':
+            OBJECT();
+            break;
+         case '[':
+            ARRAY();
+            break;
+         default:
+            yyerror("Expected STRING, NUM, OBJECT or ARRAY");
+            break;
+      }
    }
 
 
